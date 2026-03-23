@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa de Atividades — Empresas, Pessoas e Clientes</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F6F3EE;
+    --bg-card: #FFFFFF;
+    --bg-inner: #FAFAF7;
+    --text-primary: #1A1A18;
+    --text-secondary: #5C5B56;
+    --text-tertiary: #8E8D87;
+    --border: #E2E0D8;
+    --border-light: #EDECE6;
+    --accent-purple: #6C5CE7;
+    --accent-purple-light: #EDE9FE;
+    --accent-purple-text: #4C3FB5;
+    --accent-teal: #0D9488;
+    --accent-teal-light: #DFFAF5;
+    --accent-teal-text: #0A6E64;
+    --accent-amber: #D97706;
+    --accent-amber-light: #FEF6E0;
+    --accent-amber-text: #92400E;
+    --accent-coral: #E8593C;
+    --accent-coral-light: #FEF0EC;
+    --accent-coral-text: #9C3520;
+    --accent-pink: #DB2777;
+    --accent-pink-light: #FDF0F5;
+    --accent-pink-text: #9D174D;
+    --accent-blue: #2563EB;
+    --accent-blue-light: #EFF6FF;
+    --accent-blue-text: #1E40AF;
+    --accent-green: #16A34A;
+    --accent-green-light: #ECFDF5;
+    --accent-green-text: #166534;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.08);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 1100px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  .page-header { text-align: center; margin-bottom: 56px; }
+  .page-header h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500; font-size: 2.4rem;
+    letter-spacing: -0.03em; margin-bottom: 12px;
+  }
+  .page-header p { font-size: 1.05rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto; }
+
+  .legend {
+    display: flex; justify-content: center; gap: 24px; flex-wrap: wrap;
+    margin-bottom: 48px; padding: 16px 24px;
+    background: var(--bg-card); border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: var(--text-secondary); }
+  .legend-dot { width: 12px; height: 12px; border-radius: 4px; flex-shrink: 0; }
+
+  .empresa-card {
+    background: var(--bg-card); border: 1px solid var(--border-light);
+    border-radius: var(--radius); box-shadow: var(--shadow-md);
+    margin-bottom: 32px; overflow: hidden;
+    transition: box-shadow 0.3s ease;
+  }
+  .empresa-card:hover { box-shadow: var(--shadow-lg); }
+
+  .empresa-top {
+    padding: 28px 32px 24px;
+    border-bottom: 1px solid var(--border-light);
+    position: relative;
+  }
+  .empresa-top::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  }
+  .empresa-card[data-color="purple"] .empresa-top::before { background: var(--accent-purple); }
+  .empresa-card[data-color="blue"] .empresa-top::before { background: var(--accent-blue); }
+  .empresa-card[data-color="coral"] .empresa-top::before { background: var(--accent-coral); }
+  .empresa-card[data-color="green"] .empresa-top::before { background: var(--accent-green); }
+  .empresa-card[data-color="pink"] .empresa-top::before { background: var(--accent-pink); }
+  .empresa-card[data-color="amber"] .empresa-top::before { background: var(--accent-amber); }
+  .empresa-card[data-color="teal"] .empresa-top::before { background: var(--accent-teal); }
+
+  .empresa-name-row { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 6px; }
+  .empresa-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 1.5rem; letter-spacing: -0.02em; }
+  .empresa-card[data-color="purple"] .empresa-name { color: var(--accent-purple-text); }
+  .empresa-card[data-color="blue"] .empresa-name { color: var(--accent-blue-text); }
+  .empresa-card[data-color="coral"] .empresa-name { color: var(--accent-coral-text); }
+  .empresa-card[data-color="green"] .empresa-name { color: var(--accent-green-text); }
+  .empresa-card[data-color="pink"] .empresa-name { color: var(--accent-pink-text); }
+  .empresa-card[data-color="amber"] .empresa-name { color: var(--accent-amber-text); }
+  .empresa-card[data-color="teal"] .empresa-name { color: var(--accent-teal-text); }
+
+  .area-badge { font-size: 0.78rem; padding: 4px 12px; border-radius: 20px; font-weight: 500; white-space: nowrap; }
+  .empresa-card[data-color="purple"] .area-badge { background: var(--accent-purple-light); color: var(--accent-purple-text); }
+  .empresa-card[data-color="blue"] .area-badge { background: var(--accent-blue-light); color: var(--accent-blue-text); }
+  .empresa-card[data-color="coral"] .area-badge { background: var(--accent-coral-light); color: var(--accent-coral-text); }
+  .empresa-card[data-color="green"] .area-badge { background: var(--accent-green-light); color: var(--accent-green-text); }
+  .empresa-card[data-color="pink"] .area-badge { background: var(--accent-pink-light); color: var(--accent-pink-text); }
+  .empresa-card[data-color="amber"] .area-badge { background: var(--accent-amber-light); color: var(--accent-amber-text); }
+  .empresa-card[data-color="teal"] .area-badge { background: var(--accent-teal-light); color: var(--accent-teal-text); }
+
+  .empresa-stats { font-size: 0.82rem; color: var(--text-tertiary); }
+
+  .empresa-body { display: grid; grid-template-columns: 280px 1fr; min-height: 100px; }
+  @media (max-width: 700px) { .empresa-body { grid-template-columns: 1fr; } }
+
+  .pessoas-col {
+    padding: 24px 28px; background: var(--bg-inner);
+    border-right: 1px solid var(--border-light);
+  }
+  @media (max-width: 700px) { .pessoas-col { border-right: none; border-bottom: 1px solid var(--border-light); } }
+
+  .col-label {
+    font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-tertiary); margin-bottom: 14px;
+  }
+  .pessoa-list { display: flex; flex-direction: column; gap: 6px; }
+  .pessoa-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
+  .pessoa-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem; font-weight: 600; flex-shrink: 0; color: #fff;
+  }
+  .empresa-card[data-color="purple"] .pessoa-avatar { background: var(--accent-purple); }
+  .empresa-card[data-color="blue"] .pessoa-avatar { background: var(--accent-blue); }
+  .empresa-card[data-color="coral"] .pessoa-avatar { background: var(--accent-coral); }
+  .empresa-card[data-color="green"] .pessoa-avatar { background: var(--accent-green); }
+  .empresa-card[data-color="pink"] .pessoa-avatar { background: var(--accent-pink); }
+  .empresa-card[data-color="amber"] .pessoa-avatar { background: var(--accent-amber); }
+  .empresa-card[data-color="teal"] .pessoa-avatar { background: var(--accent-teal); }
+
+  .clientes-col { padding: 24px 28px; }
+  .clientes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+  .cliente-card {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 16px; background: var(--bg-card);
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .cliente-card:hover { border-color: var(--text-tertiary); transform: translateY(-1px); }
+  .cliente-name {
+    font-weight: 600; font-size: 0.92rem; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .cliente-name .icon { width: 18px; height: 18px; flex-shrink: 0; opacity: 0.5; }
+  .cliente-pessoas-list { display: flex; flex-direction: column; gap: 5px; }
+  .cp-item { display: flex; align-items: center; gap: 8px; font-size: 0.84rem; color: var(--text-secondary); }
+  .cp-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: var(--accent-teal); }
+  .cp-dot.proprio { background: var(--accent-amber); border-radius: 2px; }
+  .no-pessoas { font-size: 0.82rem; color: var(--text-tertiary); font-style: italic; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .empresa-card { animation: fadeUp 0.5s ease both; }
+  .empresa-card:nth-of-type(1) { animation-delay: 0.05s; }
+  .empresa-card:nth-of-type(2) { animation-delay: 0.1s; }
+  .empresa-card:nth-of-type(3) { animation-delay: 0.15s; }
+  .empresa-card:nth-of-type(4) { animation-delay: 0.2s; }
+  .empresa-card:nth-of-type(5) { animation-delay: 0.25s; }
+  .empresa-card:nth-of-type(6) { animation-delay: 0.3s; }
+  .empresa-card:nth-of-type(7) { animation-delay: 0.35s; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <h1>Mapa de Atividades</h1>
+    <p>Visão completa das empresas, suas equipes, áreas de atuação e os clientes/projetos com as respectivas pessoas de contato.</p>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#6C5CE7"></div>
+      <span>Pessoas da empresa</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#0D9488;border-radius:50%"></div>
+      <span>Pessoas do cliente</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#D97706;border-radius:2px"></div>
+      <span>Projeto próprio</span>
+    </div>
+  </div>
+
+  <div id="cards"></div>
+
+</div>
+
+<script>
+const data = [
+  {
+    empresa: "Taltos", area: "Suporte, governança e InfoSec", color: "purple",
+    pessoas: ["Sergio", "José", "Renato Szuster", "Higaion"],
+    clientes: [
+      { nome: "b/luz", pessoas: ["Cris — COO", "Luis Felipe — CEO"] },
+      { nome: "Alexandre Gama", pessoas: ["Alexandre Gama"] },
+      { nome: "Tuiomar", pessoas: ["Tio Dino"] },
+      { nome: "De Vivo", pessoas: ["Guilherme"] },
+      { nome: "Renato Fabrinni", pessoas: ["Renato Fabrinni"] }
+    ]
+  },
+  {
+    empresa: "Augur", area: "Advisor", color: "blue",
+    pessoas: ["Sergio"],
+    clientes: [
+      { nome: "ECP", pessoas: ["Richard", "Renato", "Henrique", "Teresa"] },
+      { nome: "b/canvas-Eliex", pessoas: ["Rogério Bromfman — CTO"] }
+    ]
+  },
+  {
+    empresa: "Sigill", area: "Desenvolvimento", color: "coral",
+    pessoas: ["Sergio", "Paulo", "Renato"],
+    clientes: [
+      { nome: "ART Controles", pessoas: ["ART Sistemas"] },
+      { nome: "OVR100", pessoas: ["Claudio"] },
+      { nome: "Contabilidade", pessoas: ["Tadeu", "Cidália"] },
+      { nome: "Tarot", pessoas: ["Kwa"] },
+      { nome: "FlashWall", pessoas: ["Próprio"], proprio: true },
+      { nome: "VoxxFlow", pessoas: ["Próprio"], proprio: true }
+    ]
+  },
+  {
+    empresa: "Lotus", area: "Consultoria agêntica", color: "green",
+    pessoas: ["Sergio", "Paulo", "Renato", "Henrique", "Ronaldo", "Vinícius"],
+    clientes: [
+      { nome: "Chili Drinks", pessoas: [] }
+    ]
+  },
+  {
+    empresa: "Prysmo", area: "Stakeholder listening", color: "pink",
+    pessoas: ["Sergio", "Neda", "Eduardo", "Hummel", "Diogo", "André", "Camila", "Equipe"],
+    clientes: [
+      { nome: "Prysmo", pessoas: ["Próprio"], proprio: true }
+    ]
+  },
+  {
+    empresa: "BRIKK", area: "Marketplace de serviços de construção civil", color: "amber",
+    pessoas: ["Sergio", "Fábio", "Paulo Hachich", "Renato", "Felipe", "Rafa", "Gabriel Ranna"],
+    clientes: [
+      { nome: "BRIKK", pessoas: ["Próprio"], proprio: true }
+    ]
+  },
+  {
+    empresa: "Alquimista da Caatinga", area: "Espumante de caju", color: "teal",
+    pessoas: ["Sergio", "Lila", "Vicente", "Renato", "Adéssio — Vendas", "Aline — Beberú", "Bia — Beberú"],
+    clientes: [
+      { nome: "Cauina", pessoas: ["Próprio"], proprio: true }
+    ]
+  }
+];
+
+function initials(name) {
+  return name.split(/[\s—-]+/).filter(w => w.length > 1).slice(0, 2).map(w => w[0].toUpperCase()).join('');
+}
+
+const container = document.getElementById('cards');
+
+data.forEach((emp) => {
+  const nP = emp.pessoas.length;
+  const nC = emp.clientes.length;
+  const iconExternal = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>';
+  const iconOwn = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 12l2 2 4-4"/></svg>';
+
+  const card = document.createElement('div');
+  card.className = 'empresa-card';
+  card.setAttribute('data-color', emp.color);
+  card.innerHTML = `
+    <div class="empresa-top">
+      <div class="empresa-name-row">
+        <span class="empresa-name">${emp.empresa}</span>
+        <span class="area-badge">${emp.area}</span>
+      </div>
+      <div class="empresa-stats">${nP} pessoa${nP > 1 ? 's' : ''} na equipe · ${nC} cliente${nC !== 1 ? 's' : ''}/projeto${nC !== 1 ? 's' : ''}</div>
+    </div>
+    <div class="empresa-body">
+      <div class="pessoas-col">
+        <div class="col-label">Equipe</div>
+        <div class="pessoa-list">
+          ${emp.pessoas.map(p => `
+            <div class="pessoa-item">
+              <div class="pessoa-avatar">${initials(p)}</div>
+              <span>${p}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="clientes-col">
+        <div class="col-label">Clientes / Projetos</div>
+        <div class="clientes-grid">
+          ${emp.clientes.map(cl => `
+            <div class="cliente-card">
+              <div class="cliente-name">
+                ${cl.proprio ? iconOwn : iconExternal}
+                ${cl.nome}
+              </div>
+              <div class="cliente-pessoas-list">
+                ${cl.pessoas.length > 0
+                  ? cl.pessoas.map(p => `
+                    <div class="cp-item">
+                      <div class="cp-dot${cl.proprio ? ' proprio' : ''}"></div>
+                      <span>${p}</span>
+                    </div>
+                  `).join('')
+                  : '<div class="no-pessoas">Sem pessoas associadas</div>'}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+  container.appendChild(card);
+});
+</script>
+</body>
+</html>
