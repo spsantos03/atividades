@@ -161,6 +161,34 @@
   .cp-dot.proprio { background: var(--accent-amber); border-radius: 2px; }
   .no-pessoas { font-size: 0.82rem; color: var(--text-tertiary); font-style: italic; }
 
+  /* Index */
+  .index {
+    background: var(--bg-card); border: 1px solid var(--border-light);
+    border-radius: var(--radius); box-shadow: var(--shadow-md);
+    padding: 28px 32px; margin-bottom: 40px;
+  }
+  .index-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 1.15rem;
+    margin-bottom: 18px; color: var(--text-primary);
+  }
+  .index-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 10px;
+  }
+  .index-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; border-radius: 10px;
+    text-decoration: none; color: var(--text-primary);
+    transition: background 0.15s;
+  }
+  .index-item:hover { background: var(--bg-inner); }
+  .index-color {
+    width: 10px; height: 36px; border-radius: 5px; flex-shrink: 0;
+  }
+  .index-info { display: flex; flex-direction: column; }
+  .index-empresa { font-weight: 600; font-size: 0.92rem; }
+  .index-area { font-size: 0.78rem; color: var(--text-tertiary); }
+
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(16px); }
     to { opacity: 1; transform: translateY(0); }
@@ -197,6 +225,8 @@
       <span>Projeto próprio</span>
     </div>
   </div>
+
+  <div class="index" id="index"></div>
 
   <div id="cards"></div>
 
@@ -274,8 +304,24 @@ function initials(name) {
 }
 
 const container = document.getElementById('cards');
+const colorMap = { purple:'#6C5CE7', blue:'#2563EB', coral:'#E8593C', green:'#16A34A', pink:'#DB2777', amber:'#D97706', teal:'#0D9488' };
+
+// Build index
+const indexEl = document.getElementById('index');
+indexEl.innerHTML = '<div class="index-title">Índice</div><div class="index-grid">' +
+  data.map((emp) => {
+    const slug = emp.empresa.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-');
+    return `<a href="#${slug}" class="index-item">
+      <div class="index-color" style="background:${colorMap[emp.color]}"></div>
+      <div class="index-info">
+        <span class="index-empresa">${emp.empresa}</span>
+        <span class="index-area">${emp.area} · ${emp.pessoas.length} pessoas · ${emp.clientes.length} cliente${emp.clientes.length!==1?'s':''}</span>
+      </div>
+    </a>`;
+  }).join('') + '</div>';
 
 data.forEach((emp) => {
+  const slug = emp.empresa.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-');
   const nP = emp.pessoas.length;
   const nC = emp.clientes.length;
   const iconExternal = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>';
@@ -283,6 +329,7 @@ data.forEach((emp) => {
 
   const card = document.createElement('div');
   card.className = 'empresa-card';
+  card.id = slug;
   card.setAttribute('data-color', emp.color);
   card.innerHTML = `
     <div class="empresa-top">
